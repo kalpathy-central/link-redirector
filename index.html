@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Project Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="spinner">
+        <div class="loader"></div>
+    </div>
+    <div id="main-content" style="display:none; text-align:center;">
+        <img src="logo.png" alt="Logo" id="logo" width="120" style="display:none;"/>
+        <h1 id="project-title"></h1>
+        <p id="project-description"></p>
+        <div id="todays-link"></div>
+    </div>
+    <script>
+    // Fetch config and control content
+    fetch('config.json')
+      .then(response => response.json())
+      .then(config => {
+        // Set title and description
+        document.getElementById('project-title').textContent = config.projectName;
+        document.getElementById('project-description').textContent = config.description;
+
+        // Show logo if enabled
+        if(config.settings.showLogo) {
+            document.getElementById('logo').style.display = 'inline-block';
+        }
+
+        // Get today's date in YYYY-MM-DD
+        const today = new Date().toISOString().slice(0, 10);
+        const link = config.dateLinks[today];
+
+        if (link) {
+          document.getElementById('todays-link').innerHTML =
+            `<p><a href="${link}" target="_blank">Today's Link</a></p>`;
+        } else {
+          document.getElementById('todays-link').innerHTML =
+            `<p>No link for today.</p>`;
+        }
+
+        // Show content after spinner delay
+        setTimeout(function() {
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+        }, config.settings.spinnerDelayMs || 3000);
+      });
+    </script>
+</body>
+</html>
