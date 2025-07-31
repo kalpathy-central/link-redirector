@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Your Project Title</title>
+    <title>Palakkad Bhajanotsavam 2025</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
@@ -37,28 +37,34 @@
             100% { transform: rotate(360deg);}
         }
         #main-content {
-            margin-top: 50px;
-            max-width: 600px;
+            margin-top: 32px;
+            max-width: 700px;
             margin-left: auto;
             margin-right: auto;
             background: #fff;
-            padding: 2em 2em 1em 2em;
+            padding: 1.2em 0.5em 1em 0.5em;
             border-radius: 10px;
             box-shadow: 0 4px 16px rgba(0,0,0,0.08);
             display: none;
             text-align: center;
         }
-        #logo {
-            margin-bottom: 20px;
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin: 0 auto;
         }
         table {
             margin: 1em auto;
             border-collapse: collapse;
-            width: 95%;
+            width: 100%;
+            min-width: 350px;
+            background: #fafafa;
+            font-size: 1em;
         }
         th, td {
-            padding: 0.5em 1em;
+            padding: 0.45em 0.5em;
             border: 1px solid #ddd;
+            text-align: left;
         }
         th {
             background: #f3f3f3;
@@ -75,7 +81,24 @@
             text-decoration: underline;
         }
         #todays-link {
-            margin-bottom: 1.5em;
+            margin-bottom: 1.3em;
+        }
+        h2 {
+            color: #800000;
+            margin-top: 0.5em;
+            margin-bottom: 0.7em;
+            font-size: 1.25em;
+        }
+        @media (max-width: 600px) {
+            #main-content {
+                padding: 0.5em 0.1em 1em 0.1em;
+            }
+            table {
+                font-size: 0.97em;
+            }
+            th, td {
+                padding: 0.35em 0.3em;
+            }
         }
     </style>
 </head>
@@ -84,58 +107,83 @@
         <div class="loader"></div>
     </div>
     <div id="main-content">
-        <img src="logo.png" alt="Logo" id="logo" width="120" style="display:none;"/>
-        <h1 id="project-title"></h1>
-        <p id="project-description"></p>
+        <h2>Palakkad Bhajanotsavam 2025</h2>
         <div id="todays-link"></div>
-        <h2>All Dates & URLs</h2>
-        <div id="all-links"></div>
+        <div class="table-wrapper">
+            <div id="all-links"></div>
+        </div>
     </div>
     <script>
+    function getQueryParams() {
+        const params = {};
+        window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
+            params[key] = decodeURIComponent(value);
+        });
+        return params;
+    }
+
     fetch('config.json')
       .then(response => response.json())
       .then(config => {
-        // Set title and description
-        document.getElementById('project-title').textContent = config.projectName || '';
-        document.getElementById('project-description').textContent = config.description || '';
+        const params = getQueryParams();
+        const dateLinks = config.dateLinks || {};
+        const today = new Date().toISOString().slice(0, 10);
 
-        // Show logo if enabled
-        if(config.settings && config.settings.showLogo) {
-            document.getElementById('logo').style.display = 'inline-block';
+        // Build a flat list of all events for the table
+        let rows = [];
+        for (const [date, events] of Object.entries(dateLinks)) {
+          for (const [event, url] of Object.entries(events)) {
+            rows.push({date, event, url});
+          }
         }
 
-        // Get today's date in YYYY-MM-DD
-        const today = new Date().toISOString().slice(0, 10);
-        const dateLinks = config.dateLinks || {};
-        const link = dateLinks[today];
+        // If ?date=YYYY-MM-DD is present, filter to that date, else show table
+        let filteredRows = rows;
+        let showTable = true;
+        let highlightDate = '';
+        let redirectUrl = null;
+        let redirectEvent = "";
 
-        // Build the date-wise table
-        let table = `<table><tr><th>Date</th><th>URL</th></tr>`;
-        for (const [date, url] of Object.entries(dateLinks)) {
-            const highlight = date === today ? ' class="today"' : '';
-            table += `<tr${highlight}><td>${date}</td><td><a href="${url}" target="_blank">${url}</a></td></tr>`;
+        // Handle ?date param
+        if(params.date) {
+            filteredRows = rows.filter(r => r.date === params.date);
+            if (filteredRows.length > 0) {
+                showTable = false;
+                highlightDate = params.date;
+                redirectEvent = filteredRows[0].event;
+                redirectUrl = filteredRows[0].url;
+            } else {
+                showTable = false;
+                document.getElementById('todays-link').innerHTML = `<p style="color:#800000;">No events found for ${params.date}.</p>`;
+            }
+        }
+
+        // Build the table
+        let table = `<table><tr><th>Date</th><th>Event</th><th>Link</th></tr>`;
+        for (const row of rows) {
+            const highlight = row.date === today ? ' class="today"' : '';
+            table += `<tr${highlight}><td>${row.date}</td><td>${row.event}</td><td><a href="${row.url}" target="_blank">Join</a></td></tr>`;
         }
         table += `</table>`;
         document.getElementById('all-links').innerHTML = table;
 
-        // After delay, either redirect or show content
+        // Spinner logic
         setTimeout(function() {
             document.getElementById('spinner').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-            if (link) {
+            if (redirectUrl) {
                 document.getElementById('todays-link').innerHTML =
-                    `<p style="color:#800000;">Redirecting to today's link: <a href="${link}">${link}</a></p>`;
+                    `<p style="color:#800000;">
+                        Redirecting to <b>${redirectEvent}</b> on ${highlightDate}:<br>
+                        <a href="${redirectUrl}">${redirectUrl}</a>
+                    </p>`;
                 setTimeout(function(){
-                    window.location.href = link;
+                    window.location.href = redirectUrl;
                 }, 1500);
-            } else {
-                document.getElementById('todays-link').innerHTML =
-                    `<p>No redirect for today. See all available links below.</p>`;
             }
         }, (config.settings && config.settings.spinnerDelayMs) || 3000);
       })
       .catch(err => {
-        // On error, show content with error message
         document.getElementById('spinner').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
         document.getElementById('main-content').innerHTML = '<p>Error loading configuration.</p>';
