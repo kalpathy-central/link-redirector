@@ -4,49 +4,141 @@
     <meta charset="UTF-8">
     <title>Your Project Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            color: #222;
+            margin: 0;
+            padding: 0;
+        }
+        #spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #fff;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+        .loader {
+            border: 8px solid #eee;
+            border-top: 8px solid #800000; /* Maroon */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1.5s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg);}
+            100% { transform: rotate(360deg);}
+        }
+        #main-content {
+            margin-top: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            background: #fff;
+            padding: 2em 2em 1em 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            display: none;
+            text-align: center;
+        }
+        #logo {
+            margin-bottom: 20px;
+        }
+        table {
+            margin: 1em auto;
+            border-collapse: collapse;
+            width: 95%;
+        }
+        th, td {
+            padding: 0.5em 1em;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #f3f3f3;
+        }
+        tr.today {
+            background: #ffe5e5;
+        }
+        a {
+            color: #800000;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #todays-link {
+            margin-bottom: 1.5em;
+        }
+    </style>
 </head>
 <body>
     <div id="spinner">
         <div class="loader"></div>
     </div>
-    <div id="main-content" style="display:none; text-align:center;">
+    <div id="main-content">
         <img src="logo.png" alt="Logo" id="logo" width="120" style="display:none;"/>
         <h1 id="project-title"></h1>
         <p id="project-description"></p>
         <div id="todays-link"></div>
+        <h2>All Dates & URLs</h2>
+        <div id="all-links"></div>
     </div>
     <script>
-    // Fetch config and control content
     fetch('config.json')
       .then(response => response.json())
       .then(config => {
         // Set title and description
-        document.getElementById('project-title').textContent = config.projectName;
-        document.getElementById('project-description').textContent = config.description;
+        document.getElementById('project-title').textContent = config.projectName || '';
+        document.getElementById('project-description').textContent = config.description || '';
 
         // Show logo if enabled
-        if(config.settings.showLogo) {
+        if(config.settings && config.settings.showLogo) {
             document.getElementById('logo').style.display = 'inline-block';
         }
 
         // Get today's date in YYYY-MM-DD
         const today = new Date().toISOString().slice(0, 10);
-        const link = config.dateLinks[today];
+        const dateLinks = config.dateLinks || {};
+        const link = dateLinks[today];
 
-        if (link) {
-          document.getElementById('todays-link').innerHTML =
-            `<p><a href="${link}" target="_blank">Today's Link</a></p>`;
-        } else {
-          document.getElementById('todays-link').innerHTML =
-            `<p>No link for today.</p>`;
+        // Build the date-wise table
+        let table = `<table><tr><th>Date</th><th>URL</th></tr>`;
+        for (const [date, url] of Object.entries(dateLinks)) {
+            const highlight = date === today ? ' class="today"' : '';
+            table += `<tr${highlight}><td>${date}</td><td><a href="${url}" target="_blank">${url}</a></td></tr>`;
         }
+        table += `</table>`;
+        document.getElementById('all-links').innerHTML = table;
 
-        // Show content after spinner delay
+        // After delay, either redirect or show content
         setTimeout(function() {
             document.getElementById('spinner').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
-        }, config.settings.spinnerDelayMs || 3000);
+            if (link) {
+                document.getElementById('todays-link').innerHTML =
+                    `<p style="color:#800000;">Redirecting to today's link: <a href="${link}">${link}</a></p>`;
+                setTimeout(function(){
+                    window.location.href = link;
+                }, 1500);
+            } else {
+                document.getElementById('todays-link').innerHTML =
+                    `<p>No redirect for today. See all available links below.</p>`;
+            }
+        }, (config.settings && config.settings.spinnerDelayMs) || 3000);
+      })
+      .catch(err => {
+        // On error, show content with error message
+        document.getElementById('spinner').style.display = 'none';
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('main-content').innerHTML = '<p>Error loading configuration.</p>';
       });
     </script>
 </body>
