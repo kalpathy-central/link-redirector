@@ -10,8 +10,6 @@
     "spinnerDelayMs": 3000
   },
   "dateLinks": {
-    "2025-07-29": "https://example.com/page1",
-    "2025-07-30": "https://example.com/page2",
-    "2025-08-01": "https://www.youtube.com/live/8LA2IsU0nW4?si=XLH9uU2EbahxT4Vr"
+    "2025-08-01": {"Rig-Vedha-Samhitha (7AM)": "https://www.youtube.com/live/8LA2IsU0nW4?si=XLH9uU2EbahxT4Vr"}
   }
 }
