@@ -1,125 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Palakkad Bhajanotsavam 2025</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            color: #222;
-            margin: 0;
-            padding: 0;
-        }
-        #spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #fff;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
-        .loader {
-            border: 8px solid #eee;
-            border-top: 8px solid #800000; /* Maroon */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1.5s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg);}
-            100% { transform: rotate(360deg);}
-        }
-        #main-content {
-            margin-top: 32px;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            background: #fff;
-            padding: 1.2em 0.5em 1em 0.5em;
-            border-radius: 10px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            display: none;
-            text-align: center;
-        }
-        .table-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            margin: 0 auto;
-        }
-        table {
-            margin: 1em auto;
-            border-collapse: collapse;
-            width: 100%;
-            min-width: 350px;
-            background: #fafafa;
-            font-size: 1em;
-        }
-        th, td {
-            padding: 0.45em 0.5em;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background: #f3f3f3;
-        }
-        tr.today {
-            background: #ffe5e5;
-        }
-        a {
-            color: #800000;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        #todays-link {
-            margin-bottom: 1.3em;
-        }
-        h2 {
-            color: #800000;
-            margin-top: 0.5em;
-            margin-bottom: 0.7em;
-            font-size: 1.25em;
-        }
-        @media (max-width: 600px) {
-            #main-content {
-                padding: 0.5em 0.1em 1em 0.1em;
-            }
-            table {
-                font-size: 0.97em;
-            }
-            th, td {
-                padding: 0.35em 0.3em;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Palakkad Bhajanotsavam 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    #spinner {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #fff;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+    .loader {
+      border: 8px solid #eee;
+      border-top: 8px solid #800000;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1.5s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    #main-content {
+      margin-top: 32px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #fff;
+      padding: 1.2em 0.5em 1em 0.5em;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      display: none;
+      text-align: center;
+    }
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      margin: 0 auto;
+    }
+    table {
+      margin: 1em auto;
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 350px;
+      background: #fafafa;
+      font-size: 1em;
+    }
+    th, td {
+      padding: 0.45em 0.5em;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background: #f3f3f3;
+    }
+    tr.today {
+      background: #ffe5e5;
+    }
+    a {
+      color: #800000;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    #todays-link {
+      margin-bottom: 1.3em;
+    }
+    h2 {
+      color: #800000;
+      margin-top: 0.5em;
+      margin-bottom: 0.7em;
+      font-size: 1.25em;
+    }
+    @media (max-width: 600px) {
+      #main-content {
+        padding: 0.5em 0.1em 1em 0.1em;
+      }
+      table {
+        font-size: 0.97em;
+      }
+      th, td {
+        padding: 0.35em 0.3em;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="spinner">
-        <div class="loader"></div>
+  <div id="spinner">
+    <div class="loader"></div>
+  </div>
+
+  <div id="main-content">
+    <h2>Palakkad Bhajanotsavam 2025</h2>
+    <div id="todays-link"></div>
+    <div class="table-wrapper">
+      <div id="all-links"></div>
     </div>
-    <div id="main-content">
-        <h2>Palakkad Bhajanotsavam 2025</h2>
-        <div id="todays-link"></div>
-        <div class="table-wrapper">
-            <div id="all-links"></div>
-        </div>
-    </div>
-    <script>
+  </div>
+
+  <script>
     function getQueryParams() {
-        const params = {};
-        window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(str,key,value) {
-            params[key] = decodeURIComponent(value);
-        });
-        return params;
+      const params = {};
+      window.location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(_, key, value) {
+        params[key] = decodeURIComponent(value);
+      });
+      return params;
     }
 
     fetch('config.json')
@@ -129,58 +131,61 @@
         const dateLinks = config.dateLinks || {};
         const today = new Date().toISOString().slice(0, 10);
 
-        // Build a flat list of all events for the table
         let rows = [];
         for (const [date, events] of Object.entries(dateLinks)) {
           for (const [event, url] of Object.entries(events)) {
-            rows.push({date, event, url});
+            rows.push({ date, event, url });
           }
         }
 
-        // If ?date=YYYY-MM-DD is present, filter to that date, else show table
         let filteredRows = rows;
         let showTable = true;
         let highlightDate = '';
         let redirectUrl = null;
         let redirectEvent = "";
 
-        // Handle ?date param
-        if(params.date) {
-            filteredRows = rows.filter(r => r.date === params.date);
-            if (filteredRows.length > 0) {
-                showTable = false;
-                highlightDate = params.date;
-                redirectEvent = filteredRows[0].event;
-                redirectUrl = filteredRows[0].url;
-            } else {
-                showTable = false;
-                document.getElementById('todays-link').innerHTML = `<p style="color:#800000;">No events found for ${params.date}.</p>`;
-            }
+        // Handle ?date param including 'today'
+        if (params.date) {
+          const requestedDate = params.date === "today" ? today : params.date;
+          filteredRows = rows.filter(r => r.date === requestedDate);
+
+          if (filteredRows.length > 0) {
+            showTable = false;
+            highlightDate = requestedDate;
+            redirectEvent = filteredRows[0].event;
+            redirectUrl = filteredRows[0].url;
+          } else {
+            showTable = false;
+            document.getElementById('todays-link').innerHTML =
+              `<p style="color:#800000;">No events found for ${requestedDate}.</p>`;
+          }
         }
 
-        // Build the table
-        let table = `<table><tr><th>Date</th><th>Event</th><th>Link</th></tr>`;
-        for (const row of rows) {
-            const highlight = row.date === today ? ' class="today"' : '';
-            table += `<tr${highlight}><td>${row.date}</td><td>${row.event}</td><td><a href="${row.url}" target="_blank">Join</a></td></tr>`;
-        }
-        table += `</table>`;
-        document.getElementById('all-links').innerHTML = table;
-
-        // Spinner logic
         setTimeout(function() {
-            document.getElementById('spinner').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-            if (redirectUrl) {
-                document.getElementById('todays-link').innerHTML =
-                    `<p style="color:#800000;">
-                        Redirecting to <b>${redirectEvent}</b> on ${highlightDate}:<br>
-                        <a href="${redirectUrl}">${redirectUrl}</a>
-                    </p>`;
-                setTimeout(function(){
-                    window.location.href = redirectUrl;
-                }, 1500);
+          document.getElementById('spinner').style.display = 'none';
+          document.getElementById('main-content').style.display = 'block';
+
+          if (redirectUrl) {
+            document.getElementById('todays-link').innerHTML =
+              `<p style="color:#800000;">
+                Redirecting to <b>${redirectEvent}</b> on ${highlightDate}:<br>
+                <a href="${redirectUrl}">${redirectUrl}</a>
+              </p>`;
+            setTimeout(function() {
+              window.location.href = redirectUrl;
+            }, 1500);
+          }
+
+          if (showTable) {
+            let table = `<table><tr><th>Date</th><th>Event</th><th>Link</th></tr>`;
+            for (const row of filteredRows) {
+              const highlight = row.date === today ? ' class="today"' : '';
+              table += `<tr${highlight}><td>${row.date}</td><td>${row.event}</td><td><a href="${row.url}" target="_blank">Join</a></td></tr>`;
             }
+            table += `</table>`;
+            document.getElementById('all-links').innerHTML = table;
+          }
+
         }, (config.settings && config.settings.spinnerDelayMs) || 3000);
       })
       .catch(err => {
@@ -188,6 +193,6 @@
         document.getElementById('main-content').style.display = 'block';
         document.getElementById('main-content').innerHTML = '<p>Error loading configuration.</p>';
       });
-    </script>
+  </script>
 </body>
 </html>
