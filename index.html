@@ -2,115 +2,185 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>KalpathyCentral - Bhajanotsavam Live Links</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KalpathyCentral</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background: #fefefe;
-      color: #333;
-      text-align: center;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f0f4f8;
+      color: #222;
     }
-    .logo-container {
+
+    #logo-container {
       display: flex;
       align-items: center;
-      justify-content: center;
-      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 16px;
     }
-    .logo-container img {
-      height: 60px;
-      margin-right: 15px;
+
+    #logo-container img {
+      height: 80px;
+      max-width: 100%;
     }
-    .logo-container h1 {
+
+    #logo-container h1 {
+      font-size: 2rem;
       margin: 0;
-      font-size: 28px;
-      font-weight: bold;
+      flex: 1;
+      min-width: 180px;
     }
+
     h2 {
-      margin-top: 10px;
-      font-size: 22px;
+      font-size: 1.5rem;
+      margin-top: 0;
+      margin-bottom: 16px;
     }
-    .loader {
-      font-size: 16px;
-      margin-top: 20px;
+
+    #loading {
+      font-size: 1rem;
+      margin-bottom: 12px;
     }
+
+    .table-container {
+      overflow-x: auto;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
     table {
-      margin: 20px auto;
       border-collapse: collapse;
-      width: 90%;
-      max-width: 1000px;
+      width: 100%;
+      min-width: 400px;
     }
+
     th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
     }
+
     th {
-      background-color: #f0f0f0;
+      background: #e6efff;
+      font-weight: 600;
     }
-    tr.today-row {
-      background-color: #e0ffe0;
-    }
+
     a {
+      color: #0077cc;
       text-decoration: none;
-      color: #0066cc;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      #logo-container h1 {
+        font-size: 1.6rem;
+      }
+
+      h2 {
+        font-size: 1.2rem;
+      }
+
+      th, td {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="logo-container">
-    <img src="logo.png" alt="Logo" />
-    <h1>Kalpathy Central</h1>
+  <div id="logo-container">
+    <img src="logo.png" alt="KalpathyCentral Logo" />
+    <h1>KalpathyCentral</h1>
   </div>
 
-  <h2>Palakkad Bhajanotsavam 2025: Live Links</h2>
-
-  <div class="loader" id="status">Loading events...</div>
-  <div id="all-links"></div>
+  <h2>Palakkad Bhajanotsavam 2025: Live links</h2>
+  <div id="loading">Loading...</div>
+  <div class="table-container" id="content"></div>
 
   <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const isTodayOnly = urlParams.has("today");
-    const today = new Date().toISOString().slice(0, 10);
+    async function loadConfig() {
+      try {
+        const response = await fetch('config.json');
+        const data = await response.json();
+        return data.dateLinks || {};
+      } catch (e) {
+        document.getElementById('loading').innerText = '❌ Failed to load config.';
+        console.error(e);
+        return null;
+      }
+    }
 
-    fetch("config.json")
-      .then(response => response.json())
-      .then(data => {
-        const allData = data.dateLinks || {};
-        const todayEvents = allData[today];
-        const status = document.getElementById("status");
+    function formatTable(dateLinks) {
+      const content = document.getElementById('content');
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      ['Date', 'Event', 'Link'].forEach(text => {
+        const th = document.createElement('th');
+        th.innerText = text;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
 
-        if (isTodayOnly && todayEvents && todayEvents.length > 0) {
+      const tbody = document.createElement('tbody');
+      for (const [date, events] of Object.entries(dateLinks)) {
+        events.forEach(eventObj => {
+          const event = Object.keys(eventObj)[0];
+          const link = eventObj[event];
+          const row = document.createElement('tr');
+
+          const dateCell = document.createElement('td');
+          dateCell.innerText = date;
+          const eventCell = document.createElement('td');
+          eventCell.innerText = event;
+          const linkCell = document.createElement('td');
+          const a = document.createElement('a');
+          a.href = link;
+          a.innerText = 'Watch Live';
+          a.target = '_blank';
+          linkCell.appendChild(a);
+
+          row.appendChild(dateCell);
+          row.appendChild(eventCell);
+          row.appendChild(linkCell);
+          tbody.appendChild(row);
+        });
+      }
+
+      table.appendChild(tbody);
+      content.appendChild(table);
+    }
+
+    async function init() {
+      const dateLinks = await loadConfig();
+      if (!dateLinks) return;
+
+      document.getElementById('loading').style.display = 'none';
+
+      const url = new URL(window.location.href);
+      const isToday = url.search.includes('today');
+
+      if (isToday) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todayEvents = dateLinks[todayStr];
+        if (todayEvents && todayEvents.length > 0) {
           const firstEvent = todayEvents[0];
-          const firstLink = Object.values(firstEvent)[0];
-          status.innerText = "Redirecting to today's first event...";
-          setTimeout(() => {
-            window.location.href = firstLink;
-          }, 1500);
+          const redirectLink = Object.values(firstEvent)[0];
+          window.location.href = redirectLink;
           return;
         }
+      }
 
-        // Build table
-        let html = `<table><tr><th>Date</th><th>Event</th><th>Link</th></tr>`;
-        Object.entries(allData).forEach(([date, events]) => {
-          const isToday = date === today;
-          events.forEach((eventObj, index) => {
-            const [eventName, eventLink] = Object.entries(eventObj)[0];
-            html += `<tr class="${isToday ? 'today-row' : ''}">`;
-            html += index === 0 ? `<td>${date}</td>` : `<td></td>`;
-            html += `<td>${eventName}</td>`;
-            html += `<td><a href="${eventLink}" target="_blank">Watch</a></td>`;
-            html += `</tr>`;
-          });
-        });
-        html += `</table>`;
+      formatTable(dateLinks);
+    }
 
-        status.style.display = "none";
-        document.getElementById("all-links").innerHTML = html;
-      })
-      .catch(err => {
-        document.getElementById("status").innerText = "Failed to load config.";
-        console.error(err);
-      });
+    init();
   </script>
 </body>
 </html>
