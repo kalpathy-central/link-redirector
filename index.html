@@ -106,17 +106,29 @@
     async function loadConfig() {
       try {
         const response = await fetch('config.json');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
         return data.dateLinks || {};
       } catch (e) {
-        document.getElementById('loading').innerText = '❌ Failed to load config.';
+        const loadingEl = document.getElementById('loading');
+        loadingEl.innerText = '❌ Failed to load config.';
         console.error(e);
         return null;
       }
     }
 
     function formatTable(dateLinks) {
-      const content = document.getElementById('content');
+      const container = document.getElementById('content');
+      container.innerHTML = '';
+
+      const keys = Object.keys(dateLinks);
+      if (keys.length === 0) {
+        container.innerHTML = '<div style="padding:12px;">No events available.</div>';
+        return;
+      }
+
+      keys.sort(); // sort by date ascending
+
       const table = document.createElement('table');
       const thead = document.createElement('thead');
       const headerRow = document.createElement('tr');
@@ -129,32 +141,46 @@
       table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
-      for (const [date, events] of Object.entries(dateLinks)) {
+      for (const date of keys) {
+        const events = dateLinks[date];
+        if (!Array.isArray(events)) continue;
+
         events.forEach(eventObj => {
-          const event = Object.keys(eventObj)[0];
-          const link = eventObj[event];
-          const row = document.createElement('tr');
+          const entries = Object.entries(eventObj);
+          if (entries.length === 0) return;
 
-          const dateCell = document.createElement('td');
-          dateCell.innerText = date;
-          const eventCell = document.createElement('td');
-          eventCell.innerText = event;
-          const linkCell = document.createElement('td');
-          const a = document.createElement('a');
-          a.href = link;
-          a.innerText = 'Watch Live';
-          a.target = '_blank';
-          linkCell.appendChild(a);
+          entries.forEach(([event, link]) => {
+            const row = document.createElement('tr');
 
-          row.appendChild(dateCell);
-          row.appendChild(eventCell);
-          row.appendChild(linkCell);
-          tbody.appendChild(row);
+            const dateCell = document.createElement('td');
+            dateCell.innerText = date;
+
+            const eventCell = document.createElement('td');
+            eventCell.innerText = event;
+
+            const linkCell = document.createElement('td');
+            const a = document.createElement('a');
+            a.href = link;
+            a.innerText = 'Watch Live';
+            a.target = '_blank';
+            a.rel = 'noopener';
+            linkCell.appendChild(a);
+
+            row.appendChild(dateCell);
+            row.appendChild(eventCell);
+            row.appendChild(linkCell);
+            tbody.appendChild(row);
+          });
         });
       }
 
       table.appendChild(tbody);
-      content.appendChild(table);
+      container.appendChild(table);
+    }
+
+    function hasTodayParam() {
+      const params = new URLSearchParams(window.location.search);
+      return params.has('today');
     }
 
     async function init() {
@@ -163,17 +189,18 @@
 
       document.getElementById('loading').style.display = 'none';
 
-      const url = new URL(window.location.href);
-      const isToday = url.search.includes('today');
-
-      if (isToday) {
-        const todayStr = new Date().toISOString().split('T')[0];
+      if (hasTodayParam()) {
+        const todayStr = new Date().toLocaleDateString('en-CA'); // 'YYYY-MM-DD'
         const todayEvents = dateLinks[todayStr];
-        if (todayEvents && todayEvents.length > 0) {
-          const firstEvent = todayEvents[0];
-          const redirectLink = Object.values(firstEvent)[0];
-          window.location.href = redirectLink;
-          return;
+        if (Array.isArray(todayEvents) && todayEvents.length > 0) {
+          const firstEvent = todayEvents.find(obj => Object.keys(obj).length > 0);
+          if (firstEvent) {
+            const redirectLink = Object.values(firstEvent)[0];
+            if (redirectLink) {
+              window.location.href = redirectLink;
+              return;
+            }
+          }
         }
       }
 
