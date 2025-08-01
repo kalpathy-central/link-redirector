@@ -98,20 +98,20 @@
     <h1>Kalpathy Central</h1>
   </div>
 
-  <h2>Palakkad Bhajanotsavam 2025: Live links</h2>
+  <h2>Bhajanotsavam 2025 – Live Event Links (From August 1st Onwards)</h2>
   <div id="loading">Loading...</div>
   <div class="table-container" id="content"></div>
 
   <script>
     async function loadConfig() {
       try {
-        const response = await fetch('config.json');
-        if (!response.ok) throw new Error('HTTP ' + response.status);
+        // Add cache-busting query param to avoid browser caching
+        const fetchUrl = 'config.json?_=' + Date.now();
+        const response = await fetch(fetchUrl);
         const data = await response.json();
         return data.dateLinks || {};
       } catch (e) {
-        const loadingEl = document.getElementById('loading');
-        loadingEl.innerText = '❌ Failed to load config.';
+        document.getElementById('loading').innerText = '❌ Failed to load config.';
         console.error(e);
         return null;
       }
